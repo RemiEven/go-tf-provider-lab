@@ -25,3 +25,38 @@ to use a locally built provider: https://developer.hashicorp.com/terraform/tutor
 
 terraform registry manifest file
 lock file
+
+---
+
+```sh
+git clone https://github.com/hashicorp/terraform-provider-scaffolding-framework
+mv terraform-provider-scaffolding-framework terraform-provider-json-file
+cd terraform-provider-json-file/
+go mod edit -module terraform-provider-json-file
+go mod tidy
+```
+---
+```sh
+# GOBIN in codespace in /go/bin
+# in /workspaces/go-tf-provider-lab/terraform-provider-json-file
+go install .
+# executable terraform-provider-json-file now in $GOBIN
+```
+
+dans le home (`/home/vscode` dans codespace), ajouter un fichier `.terraformrc`
+
+```
+provider_installation {
+
+  dev_overrides {
+      "github.com/remieven/terraform-provider-json-file" = "/go/bin"
+  }
+
+  # For all other providers, install them directly from their origin provider
+  # registries as normal. If you omit this, Terraform will _only_ use
+  # the dev_overrides block, and so no other providers will be available.
+  direct {}
+}
+```
+
+-> ca permet à TF de savoir qu'il faut utiliser notre provider défini en local
