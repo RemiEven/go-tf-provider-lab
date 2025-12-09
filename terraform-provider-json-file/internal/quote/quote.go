@@ -15,15 +15,17 @@ type Quote struct {
 	Author  string `json:"author,omitempty"`
 }
 
+// CreateQuoteFile creates a new file for the given quote and returns the generated id for it.
 func CreateQuoteFile(folder string, quote Quote) (string, error) {
 	id := uuid.New().String()
 
-	if err := WriteQuoteFile(folder, id, quotei); err != nil {
+	if err := WriteQuoteFile(folder, id, quote); err != nil {
 		return "", err
 	}
 	return id, nil
 }
 
+// WriteQuoteFile updates a file containing a quote, based on the given id.
 func WriteQuoteFile(folder string, id string, quote Quote) error {
 	file, err := os.Create(filename(folder, id))
 	if err != nil {
@@ -38,6 +40,8 @@ func WriteQuoteFile(folder string, id string, quote Quote) error {
 	return nil
 }
 
+// ReadQuote returns the content of a quote file, based on its id.
+// If no file exists with the given id, returns nil and a nil error.
 func ReadQuote(folder string, id string) (*Quote, error) {
 	file, err := os.Open(filename(folder, id))
 	if errors.Is(err, os.ErrNotExist) {
@@ -55,6 +59,7 @@ func ReadQuote(folder string, id string) (*Quote, error) {
 	return &q, nil
 }
 
+// DeleteQuoteFile deletes a quote file, based on its id.
 func DeleteQuoteFile(folder string, id string) error {
 	if err := os.Remove(filename(folder, id)); err != nil {
 		return fmt.Errorf("failed to delete quote file: %w", err)
