@@ -60,3 +60,10 @@ provider_installation {
 ```
 
 -> ca permet à TF de savoir qu'il faut utiliser notre provider défini en local
+
+/// pour générer la doc : go generate ./... (folder examples)
+
+/// logs avec TF_LOG=TRACE, TF_LOG=ERROR, (package `tflog`)
+
+attention quand on fait le plan avec un import (terraform plan -generate-config-out=generated.tf)
+-> ca ajoute dans le block generé un field `provider =` qui fait vriller le validator de versions lockées par TF jusqu'à ce qu'on le retire 

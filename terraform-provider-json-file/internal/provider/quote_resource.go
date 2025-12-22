@@ -9,6 +9,7 @@ import (
 	"terraform-provider-json-file/internal/quote"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/identityschema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
@@ -21,6 +22,7 @@ import (
 // Ensure provider defined types fully satisfy framework interfaces.
 var _ resource.ResourceWithConfigure = &QuoteResource{}
 var _ resource.ResourceWithIdentity = &QuoteResource{}
+var _ resource.ResourceWithImportState = &QuoteResource{}
 
 func NewQuoteResource() resource.Resource {
 	return &QuoteResource{}
@@ -153,6 +155,11 @@ func (r *QuoteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 
 	resp.Diagnostics.Append(resp.Identity.Set(ctx, &identityData)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
+}
+
+// ImportState implements resource.ResourceWithImportState.
+func (r *QuoteResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
+	resource.ImportStatePassthroughWithIdentity(ctx, path.Root("id"), path.Root("id"), req, resp)
 }
 
 func (r *QuoteResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
