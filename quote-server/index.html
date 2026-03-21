@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citation 2000</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column; /* Stack title above container */
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        /* The New Title Style */
+        .page-title {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            text-align: center;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            letter-spacing: -1px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .quote-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-left: 8px solid #ff0080;
+            transition: transform 0.2s ease;
+        }
+
+        .quote-card:nth-child(n+2) { border-left-color: #00d2ff; }
+        .quote-card:nth-child(n+3) { border-left-color: #3fef77; }
+
+        .quote-card:hover {
+            transform: scale(1.02);
+        }
+
+        .quote-text {
+            font-size: 1.2rem;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #2d3436;
+            margin: 0 0 15px 0;
+            white-space: pre-line;
+        }
+
+        .author {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #636e72;
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .author::before {
+            content: "— ";
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="page-title">✒️ Citation 2000 🖋️</h1>
+
+    <div class="container">
+        {{range $val := .}}
+            <div class="quote-card">
+                <p class="quote-text">{{$val.Message}}</p>
+                <div class="author">{{$val.Author}}</div>
+            </div>
+        {{end}}
+    </div>
+
+</body>
+</html>
