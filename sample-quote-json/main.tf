@@ -12,12 +12,12 @@ provider "jsonfile" {
 
 resource "jsonfile_quote" "joke1" {
     author = "adibou"
-    message = "Coucou me revoilou 0"
+    message = "Auriez-vous projeté de mettre des dinosaures dans votre parc à dinosaures ?"
 }
 
 resource "jsonfile_quote" "joke2" {
     author = "adibou"
-    message = "Coucou me revoilou fjgn"
+    message = "- Dieu crée les dinosaures. Dieu détruit les dinosaures. Dieu crée l'homme. L'homme détruit Dieu. L'homme crée les dinosaures. - Les dinosaures mangent l'homme. Et la femme hérite de la Terre."
 }
 
 # import {
