@@ -7,13 +7,13 @@
 <!-- .slide: class="toc" -->
 
 - Système de plugin de Terraform
-- Définition du provider 
-- Définition d'une resource
+- Définition du provider
+- Définition d'une ressource
     - méthodes create, read, update, delete
 - Tester son provider en local
     - logs
 - Tests automatisés
-- Documentation & publication 
+- Documentation & publication
 
 
 
@@ -87,7 +87,7 @@ provider "jsonfile" {
 
 ```go
 type Provider interface {
-    // Metadata returns the name and version of the provider 
+    // Metadata returns the name and version of the provider
 	Metadata(context.Context, MetadataRequest, *MetadataResponse)
 
     // Schema returns what should be in the provider block in HCL files
@@ -136,11 +136,11 @@ func main() {
 /* This implements the framework's Provider interface. */
 type JsonFileProvider struct {
 	version string
-} 
+}
 
 /* Used by Terraform to parse the HCL block of the provider. */
 /* Matches the provider's schema */
-type JsonFileProviderModel struct { 
+type JsonFileProviderModel struct {
 	FolderPath types.String `tfsdk:"folder_path"`
 }
 
@@ -242,7 +242,7 @@ provider "jsonfile" {
 
 ### Définition d'une ressource : interface resource
 
-Comme pour le provider, on implémente une interface : 
+Comme pour le provider, on implémente une interface :
 
 ```go
 type Resource interface {
@@ -394,9 +394,9 @@ Puis utiliser `hashicorp/terraform-plugin-docs/cmd` (souvent avec `go:generate`)
 
 
 
-### Publication 
+### Publication
 
-TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO: TODO: 
+See https://developer.hashicorp.com/terraform/registry/providers/publishing .
 
 
 

@@ -13,9 +13,9 @@ Quote
 ## Example Usage
 
 ```terraform
-resource "jsonfile_quote" "adibou" {
-    author = "adibou"
-    message = "Coucou me revoilou"
+resource "jsonfile_quote" "jurassic_park" {
+    author = "John Hammond"
+    message = "J'ai dépensé sans compter !"
 }
 ```
 
