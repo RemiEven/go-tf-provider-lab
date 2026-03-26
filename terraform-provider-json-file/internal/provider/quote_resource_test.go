@@ -15,6 +15,8 @@ import (
 )
 
 func TestAccExampleResource(t *testing.T) {
+	var tempDir = t.TempDir()
+
 	resource.Test(t, resource.TestCase{
 		IsUnitTest:               true, // this particular test is fast and only relies on local resources (else, set TF_ACC=true)
 		PreCheck:                 func() { testAccPreCheck(t) },
@@ -23,7 +25,7 @@ func TestAccExampleResource(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: `provider "jsonfile" {
-					folder_path = "/workspaces/go-tf-provider-lab/eeee"
+					folder_path = "` + tempDir + `"
 				}
 
 				resource "jsonfile_quote" "joke" {
@@ -51,7 +53,7 @@ func TestAccExampleResource(t *testing.T) {
 			// Update and Read testing
 			{
 				Config: `provider "jsonfile" {
-					folder_path = "/workspaces/go-tf-provider-lab/eeee"
+					folder_path = "` + tempDir + `"
 				}
 
 				resource "jsonfile_quote" "joke" {
