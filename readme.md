@@ -34,3 +34,6 @@ Contains learning resources. Slides use [Zenika's sensei framework](https://gith
 ##### terraform-provider-json-file
 
 Contains the actual custom provider. Based on [the Terraform Provider Scaffolding repository from Hashicorp](https://github.com/hashicorp/terraform-provider-scaffolding-framework).
+
+For an actual provider terraform provider that's supposed to be published on e.g. the Terraform registry, this folder would be the root of your repository.
+See https://github.com/mgappa/terraform-provider-ncz-json-file .
