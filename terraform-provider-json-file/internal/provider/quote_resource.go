@@ -147,6 +147,9 @@ func (r *QuoteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	if err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to read quote", "failed to read quote: "+err.Error()))
 		return
+	} else if q == nil {
+		resp.State.RemoveResource(ctx)
+		return
 	}
 
 	data := QuoteResourceModel{
