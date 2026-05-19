@@ -1,4 +1,4 @@
-package quote
+package citation2000
 
 import (
 	"encoding/json"

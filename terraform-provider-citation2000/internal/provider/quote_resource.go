@@ -6,7 +6,8 @@ package provider
 import (
 	"context"
 	"fmt"
-	"terraform-provider-json-file/internal/quote"
+
+	"github.com/remieven/citation2000"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -46,12 +47,12 @@ type QuoteResourceIdentityModel struct {
 	ID types.String `tfsdk:"id"`
 }
 
-func (r *QuoteResource) Metadata(ctx context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
+func (r *QuoteResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_quote"
 }
 
 // IdentitySchema implements resource.ResourceWithIdentity.
-func (r *QuoteResource) IdentitySchema(ctx context.Context, req resource.IdentitySchemaRequest, resp *resource.IdentitySchemaResponse) {
+func (r *QuoteResource) IdentitySchema(_ context.Context, _ resource.IdentitySchemaRequest, resp *resource.IdentitySchemaResponse) {
 	resp.IdentitySchema = identityschema.Schema{
 		Attributes: map[string]identityschema.Attribute{
 			"id": identityschema.StringAttribute{
@@ -62,7 +63,7 @@ func (r *QuoteResource) IdentitySchema(ctx context.Context, req resource.Identit
 	}
 }
 
-func (r *QuoteResource) Schema(ctx context.Context, req resource.SchemaRequest, resp *resource.SchemaResponse) {
+func (r *QuoteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		MarkdownDescription: "Quote",
 
@@ -113,12 +114,12 @@ func (r *QuoteResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	q := quote.Quote{
+	q := citation2000.Quote{
 		Message: data.Message.ValueString(),
 		Author:  data.Author.ValueString(),
 	}
 
-	id, err := quote.CreateQuoteFile(r.folderPath, q)
+	id, err := citation2000.CreateQuoteFile(r.folderPath, q)
 	if err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to create quote", "failed to create quote: "+err.Error()))
 		return
@@ -143,7 +144,7 @@ func (r *QuoteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 	}
 
 	id := identityData.ID.ValueString()
-	q, err := quote.ReadQuote(r.folderPath, id)
+	q, err := citation2000.ReadQuote(r.folderPath, id)
 	if err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to read quote", "failed to read quote: "+err.Error()))
 		return
@@ -183,12 +184,12 @@ func (r *QuoteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 
 	var (
 		id = identityData.ID.ValueString()
-		q  = quote.Quote{
+		q  = citation2000.Quote{
 			Message: data.Message.ValueString(),
 			Author:  data.Author.ValueString(),
 		}
 	)
-	if err := quote.WriteQuoteFile(r.folderPath, id, q); err != nil {
+	if err := citation2000.WriteQuoteFile(r.folderPath, id, q); err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to update quote", "failed to update quote: "+err.Error()))
 		return
 	}
@@ -206,7 +207,7 @@ func (r *QuoteResource) Delete(ctx context.Context, req resource.DeleteRequest, 
 	}
 
 	id := identityData.ID.ValueString()
-	if err := quote.DeleteQuoteFile(r.folderPath, id); err != nil {
+	if err := citation2000.DeleteQuoteFile(r.folderPath, id); err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to delete quote", "failed to delete quote: "+err.Error()))
 		return
 	}

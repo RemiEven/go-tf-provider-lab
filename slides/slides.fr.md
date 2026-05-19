@@ -1,4 +1,4 @@
-# Terraform Provider
+# Provider Terraform
 <!-- .slide: class="page-title" -->
 
 
@@ -6,59 +6,59 @@
 ## Plan
 <!-- .slide: class="toc" -->
 
-- Terraform's plugin system
-- Defining a provider
-- Testing a provider locally
-- Defining a resource
-- Automated tests
-- Documentation and publication
+- Système de plugins de Terraform
+- Définition du provider
+- Tester son provider en local
+- Définition d'une ressource
+- Tests automatisés
+- Documentation & publication
 
 
 
-### Terraform's plugin system (1/2)
+### Système de plugins de Terraform (1/2)
 
 ![](resources/terraform-plugin-overview.png)
 
-- Core: provides common interface, and discovers...
-- Plugins: executable binaries written in Go
-    - mainly providers (also provisioners)
-    - each plugin is specialized
-    - the core launches them and communicates with them over gRPC (protocol v6 for tf 1.0)
+- Core : définit une interface commune, et découvre...
+- Plugins : binaires éxecutables, écrits en Go
+	- principalement des providers (il y a aussi des provisioners)
+	- chaque plugin est spécialisé
+	- le core les lance et communique avec eux par gRPC (protocole v6 pour TF 1.0)
 
-When `terraform plan` or `terraform apply` is run, the core orchestrates communication with the adequate plugins, who only have to process unitary requests, like "create *this* resource" or "get the actual current state of *this* one".
+Quand `terraform plan` ou `terraform apply` est lancé, le core orchestre la communication avec les plugins adéquats. Ceux-ci ont juste à traiter des requêtes unitaires, comme "créé *cette* ressource", ou "quel est l'état de *celle-ci*".
 
 Notes:
-The gRPC protocol evolves (v6 for tf 1.0) and one shouldn't rely on it (no stability guarantee).
+Le protocole par gRPC évolue (v6 pour TF 1.0), et il ne faut pas essayer d'en dépendre (aucune garantie de stabilité).
 https://developer.hashicorp.com/terraform/plugin/how-terraform-works
 
 
 
-### Terraform's plugin system (2/2)
+### Système de plugins de Terraform (2/2)
 
-When `terraform init` is run, Terraform:
+Quand `terraform init` est lancé, Terraform :
 
-- reads configuration files in the working directory to determine which plugins are necessary
-- searches for installed plugins in several locations
-- sometimes downloads additional plugins
-- decides which plugin versions to use
-- writes a lock file
+- lit les fichiers de configuration dans le répertoire courant pour déterminer les pluings nécessaires
+- cherche les plugins installés à plusieurs endroits
+- parfois, télécharge des plugins
+- décide quelle version des plugins utiliser
+- écrit un *lock file*
 
-Terraform will read the lock file to ensure it uses the same plugin versions in this directory until `terraform init` is run again.
+Terraform lira ensuite ce lock file pour s'assurer que la même version des plugins sera utilisée jusqu'à ce que `terraform init` soit lancé de nouveau.
 
 
 
-### Defining a provider
+### Définition du provider
 
-To create a provider, we can use the **plugin framework** (recommended, go module `github.com/hashicorp/terraform-plugin-framework`): it replaces the older **plugin SDKv2**.
+Pour créer un provider, il est recommandé d'utiliser le **plugin framework** (go module `github.com/hashicorp/terraform-plugin-framework`). C'est le successeur du **plugin SDKv2**.
 
-The simplest way to do that is to use the template/scaffolding repository provided by Hashicorp: [https://github.com/hashicorp/terraform-provider-scaffolding-framework](https://github.com/hashicorp/terraform-provider-scaffolding-framework)
+La façon la plus simple est de se baser sur le repository "template" fourni par Hashicorp : [https://github.com/hashicorp/terraform-provider-scaffolding-framework](https://github.com/hashicorp/terraform-provider-scaffolding-framework)
 
 Notes:
-An adapter exists to migrate from SDKv2 to the more recent framework
+Il existe un adapteur pour migrer les providers du SDKv2 vers le plugin framework.
 
 
 
-### Defining a provider: Provider interface
+### Définition du provider : interface Provider
 
 ```go
 type Provider interface {
@@ -80,12 +80,12 @@ type Provider interface {
 ```
 
 Notes:
-The first 3 methods have signatures close to the ones from HTTP handlers.
--> We do develop a server (here, a gRPC one rather than an HTTP one, but that's fairly irrelevant)
+Les 3 premières méthodes ont le même type de signature que des handlers HTTP
+-> On développe bien un serveur (ici, en gRPC plutôt qu'en HTTP, mais cela ne change rien)
 
 
 
-### Defining a provider
+### Définition du provider
 
 ```go
 // This type implements the framework's Provider interface.
@@ -97,9 +97,9 @@ type Citation2000Provider struct {
 
 
 
-### Defining a provider: schema (1/2)
+### Définition du provider : schéma (1/2)
 
-*Schemes* are what Terraform uses to know what should be the content of an HCL block.
+Les *schémas* permettent d'indiquer à Terraform le contenu attendu dans un block HCL.
 
 ```go
 schema.Schema{
@@ -112,7 +112,7 @@ schema.Schema{
 }
 ```
 
-for
+pour
 
 ```terraform
 provider "citation2000" {
@@ -122,9 +122,9 @@ provider "citation2000" {
 
 
 
-### Defining a provider: schema (2/2)
+### Définition du provider : schéma (2/2)
 
-The `Schema` method is called by the framework when Terraform Core queries this data.
+La méthode `Schema` est celle appelée par le framework quand Terraform Core a besoin de cette information.
 
 ```go
 func (p *Citation2000Provider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
@@ -141,10 +141,10 @@ func (p *Citation2000Provider) Schema(_ context.Context, _ provider.SchemaReques
 
 
 
-### Defining a provider: model
+### Définition du provider : model
 
-The schema is useful to Terraform Core, but it's not an object whose properties we could use.
-To do that, we need to define a *model* type:
+Le schema est utile à Terraform Core, mais n'est pas un objet Go dont on pourrait utiliser les propriétés.
+Pour cela, on peut définir un type modèle :
 
 ```go
 /* Used by Terraform to parse the HCL block of the provider. */
@@ -155,11 +155,11 @@ type JsonFileProviderModel struct {
 ```
 
 Notes:
-Based on tags, like when eg. parsing JSON.
+Basé sur des tags, comme par exemple le parsing JSON.
 
 
 
-### Configuring the provider
+### Configuration du provider
 
 ```go
 /* Called at the beginning of the provider's lifecycle. */
@@ -176,11 +176,11 @@ func (p *Citation2000Provider) Configure(ctx context.Context, req provider.Confi
 ```
 
 Notes:
-For this provider we don't initialize an API client; instead, we fill ResourceData, which will be automatically passed to resources.
+Pour ce provider on initialise pas de client d'API : à la place on remplit ResourceData, qui sera automatiquement passé aux ressources.
 
 
 
-### Defining a provider: handling errors
+### Définition du provider : gestion des erreurs
 
 ```go
 diagnostics := req.Config.Get(ctx, &data)
@@ -190,10 +190,10 @@ if resp.Diagnostics.HasError() {
 }
 ```
 
-Rather than using the `error` type from the Go stdlib, we use `diag.Diagnostic` from the framework.
-It follows the same base principles (__errors as values__), but it can carry multiple errors/warnings.
+Plutôt que de se baser sur le type `error` de la lib standard, on utilise des `diag.Diagnostic` du framework.
+Même principe (__errors as values__) mais permet d'accumuler plusieurs erreurs/warnings.
 
-Custom diagnostics can be created:
+On peut créer ses propres diagnostics :
 
 ```go
 diag.NewErrorDiagnostic(
@@ -207,7 +207,7 @@ https://developer.hashicorp.com/terraform/plugin/framework/diagnostics
 
 
 
-### Defining a provider: listing managed ressources and datasources
+### Définition du provider : listing des ressources et datasources gérées
 
 ```go
 func (p *Citation2000Provider) Resources(_ context.Context) []func() resource.Resource {
@@ -223,7 +223,7 @@ func (p *Citation2000Provider) DataSources(_ context.Context) []func() datasourc
 
 
 
-### Defining a provider: main file
+### Définition du provider : fichier main
 
 ```go
 var version string = "dev"
@@ -243,12 +243,12 @@ func main() {
 
 
 
-### Testing a provider locally (1/2)
+### Tester son provider en local (1/2)
 
-- Check the value of the `$GOBIN` environment variable (ex: `/go/bin`)
-- In the provider's folder, `go install .`
-    - Re-run it each time the provider's code changes
-- The `~/.terraformrc` file should look like this:
+- Vérifier la valeur de la variable d'environnement `$GOBIN` (ex: `/go/bin`)
+- Depuis le dossier du provider, `go install .`
+    - À relancer à chaque fois qu'on modifie le code
+- Dans `~/.terraformrc` :
 
 ```terraform
 provider_installation {
@@ -269,9 +269,9 @@ https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/p
 
 
 
-### Testing a provider locally (2/2)
+### Tester son provider en local (2/2)
 
-To use the provider in a Terraform project:
+On peut ensuite utiliser notre provider dans un projet :
 
 ```terraform
 terraform {
@@ -288,13 +288,13 @@ provider "jsonfile" {
 }
 ```
 
-With a local provider, running `terraform init` is neither necessary nor recommended.
+Avec un provider en local, il n'est ni nécessaire, ni recommandé d'éxecuter `terraform init`.
 
 
 
-### Defining a resource: Resource interface
+### Définition d'une ressource : interface Resource
 
-Like the previously seen provider, resources implement an interface:
+Comme pour le provider, on implémente une interface :
 
 ```go
 type Resource interface {
@@ -312,11 +312,11 @@ type Resource interface {
 }
 ```
 
-Additional interfaces can be implemented/satisfied to get more advanced features, like `ResourceWithImportState`, or `ResourceWithModifyPlan`.
+Il y a des interfaces complémentaires qu'on peut également satisfaire pour implémenter des fonctionnalités plus avancées (ex: `ResourceWithImportState`, `ResourceWithModifyPlan`).
 
 
 
-### Defining a resource
+### Définition d'une ressource
 
 ```go
 // This type implements the framework's Resource interface.
@@ -331,7 +331,7 @@ func (r *QuoteResource) Metadata(ctx context.Context, req resource.MetadataReque
 
 
 
-### Defining a resource: schema
+### Définition d'une ressource : schéma
 
 ```go
 func (r *QuoteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -356,7 +356,7 @@ func (r *QuoteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp
 
 
 
-### Defining a resource: model
+### Définition d'une ressource : model
 
 ```go
 type QuoteResourceModel struct {
@@ -368,7 +368,7 @@ type QuoteResourceModel struct {
 
 
 
-### Defining a resource: configuration (optionnal)
+### Définition d'une ressource : configuration (optionel)
 
 ```go
 func (r *QuoteResource) Configure(ctx context.Context, req resource.ConfigureRequest, resp *resource.ConfigureResponse) {
@@ -392,7 +392,7 @@ func (r *QuoteResource) Configure(ctx context.Context, req resource.ConfigureReq
 
 
 
-### Defining a resource: the Create method
+### Définition d'une ressource : méthode Create
 
 ```go
 func (r *QuoteResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
@@ -424,10 +424,10 @@ func (r *QuoteResource) Create(ctx context.Context, req resource.CreateRequest, 
 
 
 
-### Defining a resource: import (optionnal)
+### Définition d'une ressource : import (optionel)
 
-The resource has to implement `resource.ResourceWithImportState`.
-If it implements `resource.ResourceWithIdentity`, a helper makes that easy:
+Implémentation de l'interface `resource.ResourceWithImportState`.
+Si notre ressource implémente `resource.ResourceWithIdentity`, on peut utiliser un helper :
 
 ```go
 // ImportState implements resource.ResourceWithImportState.
@@ -440,33 +440,34 @@ func (r *QuoteResource) ImportState(ctx context.Context, req resource.ImportStat
 
 ### Logs
 
-Plugins don't write their logs themselves: Terraform Core handles them.
+Les plugins n'écrivent pas leurs logs eux-mêmes : c'est Terraform Core qui s'en charge.
 
-Plugins use the `tflog` package from the framework: `tflog.Trace(ctx, "created quote "+id)`.
+Package `tflog` du framework : `tflog.Trace(ctx, "created quote "+id)`.
 
-Terraform doesn't display any log from providers, unless configured otherwise: `TF_LOG=TRACE`, `TF_LOG=ERROR`...
+Par défaut, Terraform n'affiche aucun log des providers.
+Il faut les activer avec par exemple `TF_LOG=TRACE`, `TF_LOG=ERROR`...
 
 Notes:
-For more advanced debugging, a provider can also be run in debug mode with delve, but it's not easy and can have side-effects (since Terraform Core doesn't manage the plugin's process lifecycle anymore).
+Pour des cas plus complexes il est également possible de lancer son provider en debug avec delve, mais c'est difficile et ça a des effets de bord (car le cycle de vie du processus du plugin n'est plus géré par Terraform core).
 
 
 
-### Automated tests
+### Tests automatisés
 
-They're based on Go's unit tests system, but use a lot of helper functions provided by the framework.
+Basé sur le système de tests unitaires de Go, mais avec une exécution contrôlée par un ensemble de fonctions utilitaires définies par le framework.
 
-Resources in test are actually created: it's closer to integration or acceptance tests than "classical" unit tests.
-Unless the environment variable `TF_ACC=true` is passed when running `go test ./...`, the tests won't be run at all.
+Les ressources sont vraiment créées : plus proche de tests d'intégration/d'acceptance que de tests unitaires.
+Par défaut, pour les lancer, il faut passer la variable d'environnement `TF_ACC=true` à `go test ./...`.
 
-In the tests, you give a terraform configuration, then you make assertions on the state.
-Created resources are automatically deleted at the end of the tests.
+On donne une configuration terraform puis on fait des assertions sur le state.
+Les ressources créées sont automatiquement supprimées à la fin.
 
 
 
 ### Documentation
 
-- Do fill the `MarkdownDescription` fields in schemes
-- Add configuration examples in the `examples` folder
+- Bien remplir dans chaque schéma les champs `MarkdownDescription`
+- Ajouter des exemples de configuration dans le dossier `examples`
 
 ```
 examples/
@@ -477,23 +478,23 @@ examples/
             resourcee.tf
 ```
 
-Then, `hashicorp/terraform-plugin-docs/cmd` can be used (often through `go:generate`) to generate `.md` files.
+Puis utiliser `hashicorp/terraform-plugin-docs/cmd` (souvent avec `go:generate`) pour générer les fichiers `.md` de la documentation.
 
-When using the scaffolding repository: `go generate ./...`.
+Si on s'est basé sur le repository de scaffolding : `go generate ./...`.
 
 
 
 ### Publication
 
-See https://developer.hashicorp.com/terraform/registry/providers/publishing .
+Voir https://developer.hashicorp.com/terraform/registry/providers/publishing .
 
-How to publish a provider differs depending on where you publish it.
-The public Terraform registry offers a CD based on webhooks.
+Publier un provider dépend beaucoup de l'endroit où on le publie.
+La registry Terraform publique propose une CD basée sur des webhooks.
 
 
 
-### Provider Terraform: links
+### Provider Terraform : pour aller plus loin
 
 - [Documentation](https://developer.hashicorp.com/terraform/plugin)
-- [Framework's Godoc](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-framework)
-- [Official tutorial](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) (~2h30)
+- [Godoc du framework](https://pkg.go.dev/github.com/hashicorp/terraform-plugin-framework)
+- [Tutoriel officiel](https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework) (~2h30)

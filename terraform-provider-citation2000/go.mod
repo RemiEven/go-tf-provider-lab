@@ -1,4 +1,4 @@
-module terraform-provider-json-file
+module terraform-provider-citation2000
 
 go 1.24.0
 
@@ -8,6 +8,7 @@ require (
 	github.com/hashicorp/terraform-plugin-go v0.29.0
 	github.com/hashicorp/terraform-plugin-log v0.10.0
 	github.com/hashicorp/terraform-plugin-testing v1.14.0
+	github.com/remieven/citation2000 v1.0.0
 )
 
 require (
@@ -85,3 +86,5 @@ require (
 )
 
 tool github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
+
+replace github.com/remieven/citation2000 v1.0.0 => ../citation2000_lib

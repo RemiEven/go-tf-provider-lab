@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"terraform-provider-json-file/internal/provider"
+	"terraform-provider-citation2000/internal/provider"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
 )
@@ -21,7 +21,7 @@ func main() {
 	flag.Parse()
 
 	opts := providerserver.ServeOpts{
-		Address: "github.com/remieven/json-file",
+		Address: "github.com/remieven/citation2000",
 		Debug:   debug,
 	}
 
