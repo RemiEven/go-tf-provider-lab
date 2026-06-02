@@ -14,7 +14,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-testing/tfjsonpath"
 )
 
-func TestAccExampleResource(t *testing.T) {
+func TestAccQuoteResource(t *testing.T) {
 	var tempDir = t.TempDir()
 
 	resource.Test(t, resource.TestCase{
@@ -24,27 +24,27 @@ func TestAccExampleResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// Create and Read testing
 			{
-				Config: `provider "jsonfile" {
+				Config: `provider "citation2000" {
 					folder_path = "` + tempDir + `"
 				}
 
-				resource "jsonfile_quote" "joke" {
+				resource "citation2000_quote" "joke" {
 					author = "adibou"
 					message = "Coucou me revoilou"
 				}`,
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("author"),
 						knownvalue.StringExact("adibou"),
 					),
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("message"),
 						knownvalue.StringExact("Coucou me revoilou"),
 					),
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("id"),
 						&uuidCheck{},
 					),
@@ -52,27 +52,27 @@ func TestAccExampleResource(t *testing.T) {
 			},
 			// Update and Read testing
 			{
-				Config: `provider "jsonfile" {
+				Config: `provider "citation2000" {
 					folder_path = "` + tempDir + `"
 				}
 
-				resource "jsonfile_quote" "joke" {
+				resource "citation2000_quote" "joke" {
 					author = "adibou"
 					message = "Oh non, bouzigouloum!"
 				}`,
 				ConfigStateChecks: []statecheck.StateCheck{
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("author"),
 						knownvalue.StringExact("adibou"),
 					),
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("message"),
 						knownvalue.StringExact("Oh non, bouzigouloum!"),
 					),
 					statecheck.ExpectKnownValue(
-						"jsonfile_quote.joke",
+						"citation2000_quote.joke",
 						tfjsonpath.New("id"),
 						&uuidCheck{},
 					),
