@@ -10,9 +10,7 @@ import (
 	"github.com/remieven/citation2000"
 
 	"github.com/hashicorp/terraform-plugin-framework/diag"
-	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
-	"github.com/hashicorp/terraform-plugin-framework/resource/identityschema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/stringplanmodifier"
@@ -22,9 +20,7 @@ import (
 
 // Ensure provider defined types fully satisfy framework interfaces.
 var (
-	_ resource.ResourceWithConfigure   = &QuoteResource{}
-	_ resource.ResourceWithIdentity    = &QuoteResource{}
-	_ resource.ResourceWithImportState = &QuoteResource{}
+	_ resource.ResourceWithConfigure = &QuoteResource{}
 )
 
 func NewQuoteResource() resource.Resource {
@@ -43,24 +39,8 @@ type QuoteResourceModel struct {
 	ID      types.String `tfsdk:"id"`
 }
 
-type QuoteResourceIdentityModel struct {
-	ID types.String `tfsdk:"id"`
-}
-
 func (r *QuoteResource) Metadata(_ context.Context, req resource.MetadataRequest, resp *resource.MetadataResponse) {
 	resp.TypeName = req.ProviderTypeName + "_quote"
-}
-
-// IdentitySchema implements resource.ResourceWithIdentity.
-func (r *QuoteResource) IdentitySchema(_ context.Context, _ resource.IdentitySchemaRequest, resp *resource.IdentitySchemaResponse) {
-	resp.IdentitySchema = identityschema.Schema{
-		Attributes: map[string]identityschema.Attribute{
-			"id": identityschema.StringAttribute{
-				Description:       "ID of the quote",
-				RequiredForImport: true,
-			},
-		},
-	}
 }
 
 func (r *QuoteResource) Schema(_ context.Context, _ resource.SchemaRequest, resp *resource.SchemaResponse) {
@@ -125,25 +105,20 @@ func (r *QuoteResource) Create(ctx context.Context, req resource.CreateRequest, 
 		return
 	}
 
-	identityData := QuoteResourceIdentityModel{
-		ID: types.StringValue(id),
-	}
 	data.ID = types.StringValue(id)
 
 	tflog.Trace(ctx, "created quote "+id)
-	resp.Diagnostics.Append(resp.Identity.Set(ctx, &identityData)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
 }
 
 func (r *QuoteResource) Read(ctx context.Context, req resource.ReadRequest, resp *resource.ReadResponse) {
-	// Read identity data
-	var identityData QuoteResourceIdentityModel
-	resp.Diagnostics.Append(req.Identity.Get(ctx, &identityData)...)
+	var data QuoteResourceModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	id := identityData.ID.ValueString()
+	id := data.ID.ValueString()
 	q, err := citation2000.ReadQuote(r.folderPath, id)
 	if err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to read quote", "failed to read quote: "+err.Error()))
@@ -153,19 +128,13 @@ func (r *QuoteResource) Read(ctx context.Context, req resource.ReadRequest, resp
 		return
 	}
 
-	data := QuoteResourceModel{
+	data = QuoteResourceModel{
 		Message: types.StringValue(q.Message),
 		Author:  types.StringValue(q.Author),
 		ID:      types.StringValue(id),
 	}
 
-	resp.Diagnostics.Append(resp.Identity.Set(ctx, &identityData)...)
 	resp.Diagnostics.Append(resp.State.Set(ctx, &data)...)
-}
-
-// ImportState implements resource.ResourceWithImportState.
-func (r *QuoteResource) ImportState(ctx context.Context, req resource.ImportStateRequest, resp *resource.ImportStateResponse) {
-	resource.ImportStatePassthroughWithIdentity(ctx, path.Root("id"), path.Root("id"), req, resp)
 }
 
 func (r *QuoteResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
@@ -175,15 +144,8 @@ func (r *QuoteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 		return
 	}
 
-	// Read identity data
-	var identityData QuoteResourceIdentityModel
-	resp.Diagnostics.Append(req.Identity.Get(ctx, &identityData)...)
-	if resp.Diagnostics.HasError() {
-		return
-	}
-
 	var (
-		id = identityData.ID.ValueString()
+		id = data.ID.ValueString()
 		q  = citation2000.Quote{
 			Message: data.Message.ValueString(),
 			Author:  data.Author.ValueString(),
@@ -199,14 +161,13 @@ func (r *QuoteResource) Update(ctx context.Context, req resource.UpdateRequest, 
 }
 
 func (r *QuoteResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
-	// Read identity data
-	var identityData QuoteResourceIdentityModel
-	resp.Diagnostics.Append(req.Identity.Get(ctx, &identityData)...)
+	var data QuoteResourceModel
+	resp.Diagnostics.Append(req.State.Get(ctx, &data)...)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	id := identityData.ID.ValueString()
+	id := data.ID.ValueString()
 	if err := citation2000.DeleteQuoteFile(r.folderPath, id); err != nil {
 		resp.Diagnostics.Append(diag.NewErrorDiagnostic("failed to delete quote", "failed to delete quote: "+err.Error()))
 		return
