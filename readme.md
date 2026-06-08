@@ -17,7 +17,7 @@ A simple HTTP server to display a page with all quotes in the `myquotes` folder.
 To run it:
 
 ```bash
-cd ./quote-server
+cd ./citation2000_webui
 go run main.go
 ```
 
@@ -25,7 +25,7 @@ Then open http://localhost:5678/ (or the appropriate host if using codespaces).
 
 ##### myquotes_tf
 
-An example of Terraform project that uses the provider defined in the `terraform-provider-json-file` folder.
+An example of Terraform project that uses the provider defined in the `terraform-provider-citation2000` folder.
 
 ##### slides
 
